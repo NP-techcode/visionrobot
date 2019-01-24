@@ -1,0 +1,30 @@
+function[]=test();
+clc
+vid = videoinput('winvideo', 1,'I420_320x240');
+
+set(vid,'TriggerRepeat',Inf);
+vid.FrameGrabInterval = 3;
+start(vid);
+
+while(vid.FramesAcquired<=30)
+    tic
+imy=getdata(vid,1);
+
+[r c d]=size(imy); 
+k=imy(:,:,1)>60 & imy(:,:,2)<50 &imy(:,:,3)>50;
+se = strel('disk',4,4);
+k=double(k);
+yu=imerode(k,se);
+bw = bwareaopen(yu,a12);
+figure(1)
+[l,n] = bwlabeln(bw,26);
+bh=regionprops(l,'BoundingBox');
+imshow(ycbcr2rgb(imy));
+% For making the rectange  >>>type      help rectange
+rectangle('Position',[bh.BoundingBox(1),bh.BoundingBox(2),bh.BoundingBox(3),bh.BoundingBox(4)],...
+'Curvature',[0,0],...
+         'LineWidth',2,'LineStyle','-')
+end
+toc
+stop(vid);
+end
